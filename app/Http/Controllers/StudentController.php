@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StudentsResource;
 use App\Models\Student;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return Student::all();
+        return StudentsResource::collection(Student::all());
     }
 
     /**
@@ -42,7 +43,7 @@ class StudentController extends Controller
 
         $data->save();
 
-        return $data;
+        return new StudentsResource($data);
     }
 
     /**
@@ -53,7 +54,30 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        return $student;
+        // Very Basic method (Not recommended)
+        // return $student;
+
+        // Recommended Step 00
+        // return response()->json([
+        //     'status' => 200,
+        //     'data' => $student
+        // ]);
+
+        // Another Recommended Step 01
+        // return response()->json([
+        //     'status' => 200,
+        //     'data' => [
+        //         'id' => $student->id,
+        //         'type' => 'Student',
+        //         'attributes' => [
+        //             'name' => $student->name,
+        //             'created_at' => $student->created_at,
+        //             'updated_at' => $student->updated_at
+        //         ]
+        //     ]
+        // ]);
+
+        return new StudentsResource($student);
     }
 
     /**
@@ -83,7 +107,7 @@ class StudentController extends Controller
 
         $data->update();
 
-        return $data;
+        return new StudentsResource($data);
     }
 
     /**
@@ -94,6 +118,10 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+        $student->delete();
+        return response()->json([
+            'status' => '204',
+            'message' => 'Student has been deleted'
+        ]);
     }
 }
